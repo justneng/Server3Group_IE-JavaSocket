@@ -94,16 +94,17 @@ public class Server3 implements Runnable {
         return fileType;
     }
 
-    public static void recieveFile(File file, int fileNameLenght) {
+    public static void recieveFile(String fileName, int fileNameLenght) {
         try {
-            System.out.println(file.getAbsolutePath() + " was downloaded");
             byte[] byteBuff = new byte[1024];
             int len = -1;
-            fileOutputStream = new FileOutputStream(file);
+            File fileRecived = new File(fileName); 
+            FileOutputStream fileOutputStream = new FileOutputStream(fileRecived);
+            DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
             while ((len = dataInputStream.read(byteBuff)) != 4) {
                 fileOutputStream.write(byteBuff, 0, len);
-                System.out.println(len);
             }
+            System.out.println(fileRecived.getAbsolutePath() + " was downloaded");
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -159,7 +160,8 @@ public class Server3 implements Runnable {
                                 securityException.printStackTrace();
                             }
                         }
-                        recieveFile(new File("C:\\Download-from-client\\" + findFileName(fileNameRecieved) + "-downloaded." + findFileType(fileNameRecieved)), fileNameRecieved.length() + 1);
+                        String fileName = "C:\\Download-from-client\\" + findFileName(fileNameRecieved) + "-downloaded." + findFileType(fileNameRecieved);
+                        recieveFile(fileName, fileNameRecieved.length() + 1);
                     }
                 } while (!messageOut.equals("bye"));
             }
