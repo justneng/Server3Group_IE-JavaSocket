@@ -97,11 +97,12 @@ public class Client implements Runnable {
         try {
             byte[] byteBuff = new byte[1024];
             int len = -1;
-            fileOutputStream = new FileOutputStream(file);
+            FileOutputStream fileOutputStream = new FileOutputStream(file);
             while ((len = dataInputStream.read(byteBuff)) != 4) {
                 fileOutputStream.write(byteBuff, 0, len);
                 fileOutputStream.flush();
             }
+            fileOutputStream.close();
             System.out.println(file.getAbsolutePath() + " was downloaded");
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
