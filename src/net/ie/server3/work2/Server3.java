@@ -103,7 +103,9 @@ public class Server3 implements Runnable {
             DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
             while ((len = dataInputStream.read(byteBuff)) != 4) {
                 fileOutputStream.write(byteBuff, 0, len);
+                fileOutputStream.flush();
             }
+            fileOutputStream.close();
             System.out.println(fileRecived.getAbsolutePath() + " was downloaded");
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
