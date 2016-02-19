@@ -54,6 +54,7 @@ public class Client implements Runnable {
         try {
             thread1 = new Thread(this);
             thread2 = new Thread(this);
+//            socket = new Socket("192.168.10.233", 12121);
             socket = new Socket("localhost", 12121);
             bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             dataInputStream = new DataInputStream(socket.getInputStream());
@@ -66,14 +67,15 @@ public class Client implements Runnable {
 
     public static void sendFile(File file, String fileName) throws FileNotFoundException, IOException {
         byte[] bytesBuffer = new byte[1024];
-        dataOutputStream = new DataOutputStream(socket.getOutputStream());
-        dataInputStream = new DataInputStream(new FileInputStream(file));
+        DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+        DataInputStream dataInputStream = new DataInputStream(new FileInputStream(file));
         dataOutputStream.writeBytes(fileName + "#\n");
         int len = 0;
         while ((len = dataInputStream.read(bytesBuffer)) != -1) {
             dataOutputStream.write(bytesBuffer, 0, len);
             dataOutputStream.flush();
         }
+        dataInputStream.close();
         System.out.println("upload file " + fileName + " Successfull");
     }
 
