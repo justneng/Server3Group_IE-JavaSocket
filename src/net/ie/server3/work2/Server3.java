@@ -69,14 +69,15 @@ public class Server3 implements Runnable {
 
     public static void sendFile(File file, String fileName) throws FileNotFoundException, IOException {
         byte[] bytesBuffer = new byte[1024];
-        dataOutputStream = new DataOutputStream(socket.getOutputStream());
-        dataInputStream = new DataInputStream(new FileInputStream(file));
+        DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+        DataInputStream dataInputStream = new DataInputStream(new FileInputStream(file));
         dataOutputStream.writeBytes(fileName + "#\n");
         int len = 0;
         while ((len = dataInputStream.read(bytesBuffer)) != -1) {
             dataOutputStream.write(bytesBuffer, 0, len);
             dataOutputStream.flush();
         }
+        dataOutputStream.close();
         System.out.println("upload file " + fileName + " Successfull");
     }
 
