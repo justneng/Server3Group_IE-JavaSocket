@@ -5,23 +5,8 @@
  */
 package net.ie.server3.work2;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.Scanner;
+import java.io.*;
+import java.net.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,84 +15,22 @@ import java.util.logging.Logger;
  * @author wanchana
  */
 public class Client implements Runnable {
-    
-    public static ServerSocket serversocket;
-    public static BufferedReader bufferedReader1;
-    public static BufferedReader bufferedReader2;
-    public static PrintWriter printWriter;
-    public static BufferedOutputStream bufferedOutputStream;
-    public static OutputStream outputStream;
+
     public static Socket socket;
     public static Thread thread1;
     public static Thread thread2;
-    public static String messageIn = "";
-    public static String messageOut = "";
-    public static FileInputStream fileInputStream;
-    public static DataOutputStream dataOutputStream;
-    public static DataInputStream dataInputStream;
-    public static FileOutputStream fileOutputStream;
-    public static InputStream inputStream;
-    public static BufferedInputStream bufferedInputStream;
-    public static BufferedReader bufferedReader ;
-    
+
     public Client() {
         try {
             thread1 = new Thread(this);
             thread2 = new Thread(this);
-//            socket = new Socket("192.168.10.233", 12121);
+//            socket = new Socket("192.168.10.233", 55555);
             socket = new Socket("localhost", 12121);
-            bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            dataInputStream = new DataInputStream(socket.getInputStream());
             thread1.start();
             thread2.start();
 
         } catch (Exception e) {
-        }
-    }
-
-    public static void sendFile(File file, String fileName) throws FileNotFoundException, IOException {
-        byte[] bytesBuffer = new byte[1024];
-        DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
-        DataInputStream dataInputStream = new DataInputStream(new FileInputStream(file));
-        dataOutputStream.writeBytes(fileName + "#\n");
-        int len = 0;
-        while ((len = dataInputStream.read(bytesBuffer)) != -1) {
-            dataOutputStream.write(bytesBuffer, 0, len);
-            dataOutputStream.flush();
-        }
-        dataInputStream.close();
-        System.out.println("upload file " + fileName + " Successfull");
-    }
-
-    public String findFileName(String path) {
-        String fileName = "";
-        File file = new File(path);
-        fileName = (file.getName()).substring(0, (file.getName()).indexOf("."));
-        return fileName;
-    }
-
-    public String findFileType(String path) {
-        String fileType = "";
-        String[] seperate = path.split("\"");
-        fileType = seperate[seperate.length - 1].substring(seperate[seperate.length - 1].indexOf(".") + 1);
-        return fileType;
-    }
-
-    public static void recieveFile(File file, int fileNameLenght) {
-        try {
-            byte[] byteBuff = new byte[1024];
-            int len = -1;
-            FileOutputStream fileOutputStream = new FileOutputStream(file);
-            while ((len = dataInputStream.read(byteBuff)) != 4) {
-                fileOutputStream.write(byteBuff, 0, len);
-                fileOutputStream.flush();
-            }
-            fileOutputStream.close();
-            System.out.println(file.getAbsolutePath() + " was downloaded");
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            e.printStackTrace();
         }
     }
 
@@ -115,18 +38,27 @@ public class Client implements Runnable {
 
         try {
             if (Thread.currentThread() == thread2) {
-                do {
-                    bufferedReader1 = new BufferedReader(new InputStreamReader(System.in));
-                    printWriter = new PrintWriter(socket.getOutputStream(), true);
-                    messageIn = bufferedReader1.readLine();
+                DataInputStream dataInputStream = null;
+                DataOutputStream dataOutputStream = null;
+                BufferedReader bufferedReader = null;
+                PrintWriter printWriter = null;
+                String messageIn = "";
+                String messageOut = "";
                     
+                do {
+                    dataInputStream = new DataInputStream(socket.getInputStream());
+                    dataOutputStream = new DataOutputStream(socket.getOutputStream());
+                    bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+                    printWriter = new PrintWriter(socket.getOutputStream(), true);
+                    messageIn = bufferedReader.readLine();
+
                     if (messageIn.equalsIgnoreCase("sw")) {
                         System.out.print("Upload file to server (path) : ");
-                        bufferedReader1 = new BufferedReader(new InputStreamReader(System.in));
-                        String fileUpload = bufferedReader1.readLine();
+                        bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+                        String fileUpload = bufferedReader.readLine();
                         File file = new File(fileUpload);
                         if (file.exists()) {
-                            sendFile(file, fileUpload);
+                            FileManager.sendFile(file, dataInputStream, dataOutputStream);
                             System.out.println("Please Enter to continue...");
                         } else {
                             System.out.println("File does not exist!");
@@ -136,9 +68,17 @@ public class Client implements Runnable {
                     }
                 } while (!messageIn.equals("bye"));
             } else {
+                DataInputStream dataInputStream = null;
+                DataOutputStream dataOutputStream = null;
+                BufferedReader bufferedReader = null;
+                PrintWriter printWriter = null;
+                String messageIn = "";
+                String messageOut = "";
                 do {
-                    bufferedReader2 = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    String msg = bufferedReader2.readLine();
+                    dataInputStream = new DataInputStream(socket.getInputStream());
+                    dataOutputStream = new DataOutputStream(socket.getOutputStream());
+                    bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    String msg = bufferedReader.readLine();
                     String checkMsg = msg.substring(0, 2);
                     String fileNameRecieved = "";
 
@@ -159,12 +99,15 @@ public class Client implements Runnable {
                                 securityException.printStackTrace();
                             }
                         }
-                        recieveFile(new File("C:\\Download-from-server\\" + findFileName(fileNameRecieved) + "-downloaded." + findFileType(fileNameRecieved)), fileNameRecieved.length() + 1);
+
+                        File file = new File("C:\\Download-from-server\\" + FileManager.findFileName(fileNameRecieved) + "-downloaded." + FileManager.findFileType(fileNameRecieved));
+                        FileManager.recieveFile(file, dataInputStream, dataOutputStream);
                     }
 
                 } while (!messageOut.equals("bye"));
             }
         } catch (Exception e) {
+            e.printStackTrace();
         }
 
     }
