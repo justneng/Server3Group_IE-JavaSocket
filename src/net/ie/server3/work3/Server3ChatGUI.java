@@ -44,29 +44,40 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
+import net.ie.server3.work2.FileManager;
+import static net.ie.server3.work3.ClientChatGUI.dataInputStream;
+import static net.ie.server3.work3.ClientChatGUI.dataOutputStream;
 
 /**
  *
  * @author wanchana
  */
-public class Server3ChatGUI extends javax.swing.JFrame{
+public class Server3ChatGUI extends javax.swing.JFrame implements Runnable{
 
     /**
      * Creates new form Server3ChatGUI
      */
     
-    static ServerSocket serverSocket;
-    static Socket socket;
-    static DataInputStream dataInputStream;
-    static DataOutputStream dataOutputStream;
-    static FileInputStream fileInputStream = null;
-    static BufferedInputStream bufferedInputStream = null;
-    static ObjectInputStream objectInputStream = null;
-    static BufferedOutputStream bufferedOutputStream = null;
-    static OutputStream outputStream = null;
+    public static ServerSocket serversocket;
+    public static Socket socket;
+    public static Thread thread1;
+    public static Thread thread2;
     
     public Server3ChatGUI() {
         initComponents();
+    }
+    
+    public Server3ChatGUI(int numb){
+        try {
+            thread1 = new Thread(this);
+            thread2 = new Thread(this);
+            serversocket = new ServerSocket(12121);
+            socket = serversocket.accept();
+            thread1.start();
+            thread2.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -94,7 +105,8 @@ public class Server3ChatGUI extends javax.swing.JFrame{
             }
         });
 
-        jButton1.setText("ส่ง");
+        jButton1.setText("send");
+        jButton1.setActionCommand("send");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -103,7 +115,7 @@ public class Server3ChatGUI extends javax.swing.JFrame{
 
         jScrollPane2.setViewportView(jTextPane1);
 
-        jButton2.setText("ไฟล์");
+        jButton2.setText("file");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
@@ -121,11 +133,11 @@ public class Server3ChatGUI extends javax.swing.JFrame{
                     .addComponent(jScrollPane2)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 254, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(23, 23, 23))
         );
         layout.setVerticalGroup(
@@ -199,45 +211,45 @@ public class Server3ChatGUI extends javax.swing.JFrame{
 //                }
             }
         }
-        else{
-            try {
-                System.out.println("do here");
-                StyledDocument doc = jTextPane1.getStyledDocument();
-                SimpleAttributeSet style = new SimpleAttributeSet();
-                StyleConstants.setBackground(style, Color.LIGHT_GRAY);
-                StyleConstants.setBold(style, true); 
-                doc.insertString(doc.getLength(), "\nคุณ พูดว่า : " + messagOut, style);
-                dataOutputStream.writeUTF(messagOut);
-            } catch (IOException ex) {
-                Logger.getLogger(Server3ChatGUI.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (BadLocationException ex) {
-                Logger.getLogger(Server3ChatGUI.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+//        else{
+//            try {
+//                System.out.println("do here");
+//                StyledDocument doc = jTextPane1.getStyledDocument();
+//                SimpleAttributeSet style = new SimpleAttributeSet();
+//                StyleConstants.setBackground(style, Color.LIGHT_GRAY);
+//                StyleConstants.setBold(style, true); 
+//                doc.insertString(doc.getLength(), "\nคุณ พูดว่า : " + messagOut, style);
+//                dataOutputStream.writeUTF(messagOut);
+//            } catch (IOException ex) {
+//                Logger.getLogger(Server3ChatGUI.class.getName()).log(Level.SEVERE, null, ex);
+//            } catch (BadLocationException ex) {
+//                Logger.getLogger(Server3ChatGUI.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
           
-        JFileChooser jFileChooser = new JFileChooser();
-                
-        int fileChooser = jFileChooser.showDialog(null, "Choose file");
-
-        if(fileChooser == JFileChooser.APPROVE_OPTION){
-            File file = jFileChooser.getSelectedFile();
-            BufferedImage img = null;
-            try{
-                img = ImageIO.read(file);
-            } catch(IOException e){
-                e.printStackTrace();
-            }
-            if(isImage(file)){
-                jLabel1.setIcon(new ImageIcon(img));
-                jTextField1.setText(jFileChooser.getSelectedFile().toString());
-            }
-            else{
-                jTextField1.setText(jFileChooser.getSelectedFile().toString());
-            }
-        }
+//        JFileChooser jFileChooser = new JFileChooser();
+//                
+//        int fileChooser = jFileChooser.showDialog(null, "Choose file");
+//
+//        if(fileChooser == JFileChooser.APPROVE_OPTION){
+//            File file = jFileChooser.getSelectedFile();
+//            BufferedImage img = null;
+//            try{
+//                img = ImageIO.read(file);
+//            } catch(IOException e){
+//                e.printStackTrace();
+//            }
+//            if(isImage(file)){
+//                jLabel1.setIcon(new ImageIcon(img));
+//                jTextField1.setText(jFileChooser.getSelectedFile().toString());
+//            }
+//            else{
+//                jTextField1.setText(jFileChooser.getSelectedFile().toString());
+//            }
+//        }
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
@@ -251,43 +263,46 @@ public class Server3ChatGUI extends javax.swing.JFrame{
             }
         });
         
-        String messageFromClient = "";
-        
-        try{
-            serverSocket = new ServerSocket(55555);
-            socket = serverSocket.accept();
-            
-            while(true){
-                dataOutputStream = new DataOutputStream(socket.getOutputStream());
-                if(!(new File(dataOutputStream.toString())).isAbsolute()){
-//                if(false){
-                    dataInputStream = new DataInputStream(socket.getInputStream());
-                    messageFromClient = dataInputStream.readUTF();
-                    StyledDocument doc = jTextPane1.getStyledDocument();
-                    SimpleAttributeSet style = new SimpleAttributeSet();
-                    StyleConstants.setBackground(style, Color.green);
-                    StyleConstants.setBold(style, true); 
-                    StyleConstants.setAlignment(style,100);
-                    doc.insertString(doc.getLength(), "\nClient พูดว่า : " + messageFromClient, style);
-                }
-                else{
-                    System.out.println("Gotcha");
-                }
-
-            }
-            
-        } catch(Exception e){
-            e.printStackTrace();
-        } finally{
-            try {
-                if (bufferedInputStream != null) bufferedInputStream.close();
-                if (fileInputStream != null) fileInputStream.close();
-                if (outputStream != null) outputStream.close();
-                if (socket != null) socket.close();
-            } catch (IOException ex) {
-                Logger.getLogger(Server3ChatGUI.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+        new Server3ChatGUI(1);
+//        Styles.setMessageStyleWelcome(jTextPane1, "Server is ready to connetions...");
+//        Styles.setMessageStyleWelcome(jTextPane1, "\nConnected with Client IP " + socket.getInetAddress().getHostAddress());
+//        String messageFromClient = "";
+//        
+//        try{
+//            ServerSocket serverSocket = new ServerSocket(55555);
+//            socket = serverSocket.accept();
+//            
+//            while(true){
+//                dataOutputStream = new DataOutputStream(socket.getOutputStream());
+//                if(!(new File(dataOutputStream.toString())).isAbsolute()){
+////                if(false){
+//                    dataInputStream = new DataInputStream(socket.getInputStream());
+//                    messageFromClient = dataInputStream.readUTF();
+//                    StyledDocument doc = jTextPane1.getStyledDocument();
+//                    SimpleAttributeSet style = new SimpleAttributeSet();
+//                    StyleConstants.setBackground(style, Color.green);
+//                    StyleConstants.setBold(style, true); 
+//                    StyleConstants.setAlignment(style,100);
+//                    doc.insertString(doc.getLength(), "\nClient พูดว่า : " + messageFromClient, style);
+//                }
+//                else{
+//                    System.out.println("Gotcha");
+//                }
+//
+//            }
+//            
+//        } catch(Exception e){
+//            e.printStackTrace();
+//        } finally{
+//            try {
+//                if (bufferedInputStream != null) bufferedInputStream.close();
+//                if (fileInputStream != null) fileInputStream.close();
+//                if (outputStream != null) outputStream.close();
+//                if (socket != null) socket.close();
+//            } catch (IOException ex) {
+//                Logger.getLogger(Server3ChatGUI.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -299,26 +314,70 @@ public class Server3ChatGUI extends javax.swing.JFrame{
     private static javax.swing.JTextPane jTextPane1;
     // End of variables declaration//GEN-END:variables
 
-    public static Boolean isPath(String path){
-        File file = new File(path);
-        
-        try{
-            file.getCanonicalPath();
-            return true;
-        } catch(IOException e){
-            return false;
-        }
-    }
-    
-    public static Boolean isImage(File file){
-        String mimetype = new MimetypesFileTypeMap().getContentType(file);
-        String type = mimetype.split("/")[0];
-        
-        if(type.equals("image")){
-            return true;
-        }
-        else{
-            return false;
+    @Override
+    public void run() {
+        try {
+            if (Thread.currentThread() == thread1) {
+                DataInputStream dataInputStream = null;
+                DataOutputStream dataOutputStream = null;
+                BufferedReader bufferedReader = null;
+                PrintWriter printWriter = null;
+                String messageIn = "";
+                String messageOut = "";
+                do {
+                    dataInputStream = new DataInputStream(socket.getInputStream());
+                    dataOutputStream = new DataOutputStream(socket.getOutputStream());
+                    printWriter = new PrintWriter(socket.getOutputStream(), true);
+                    messageIn = dataInputStream.readUTF();
+                    Styles.setMessageStyleRecieved(jTextPane1, messageIn);
+                } while (!messageIn.equals("bye"));
+            }
+            else {
+                DataInputStream dataInputStream = null;
+                DataOutputStream dataOutputStream = null;
+                BufferedReader bufferedReader = null;
+                PrintWriter printWriter = null;
+                String messageIn = "";
+                String messageOut = "";
+                do {
+                    dataInputStream = new DataInputStream(socket.getInputStream());
+                    dataOutputStream = new DataOutputStream(socket.getOutputStream());
+                    bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    String msg = bufferedReader.readLine();
+                    String checkMsg = msg.substring(0, 2);
+                    String fileNameRecieved = "";
+
+                    if (checkMsg.equals("m$")) {
+                        System.out.println("");
+                        messageOut = msg.substring(2, msg.length());
+                        System.out.println("Client says : : : " + messageOut);
+                    } else {
+                        fileNameRecieved = msg.substring(0, msg.indexOf("#"));
+                        File dir = new File("C:\\Download-from-client");
+                        if (!dir.exists()) {
+                            try {
+                                System.out.println("Creating... directory C:\\Download-from-client");
+                                dir.mkdir();
+                                System.out.println("The directory created");
+                            } catch (SecurityException securityException) {
+                                System.out.println("SecurityException occure!!!");
+                                securityException.printStackTrace();
+                            }
+                        }
+                        File file = new File("C:\\Download-from-client\\" + FileManager.findFileName(fileNameRecieved) + "-downloaded." + FileManager.findFileType(fileNameRecieved));
+                        FileManager.recieveFile(file, dataInputStream, dataOutputStream);
+                    }
+                } while (!messageOut.equals("bye"));
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally{
+            try {
+                socket.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Server3ChatGUI.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 }
