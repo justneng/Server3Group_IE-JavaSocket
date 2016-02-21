@@ -18,7 +18,7 @@ import javax.swing.text.StyledDocument;
  */
 public class Styles {
     
-    public static SimpleAttributeSet setMessageStyleWelcome(JTextPane jTextPane, String msg) throws BadLocationException {
+    public static SimpleAttributeSet setStyleMessageWelcome(JTextPane jTextPane, String msg) throws BadLocationException {
         StyledDocument doc = jTextPane.getStyledDocument();
         SimpleAttributeSet style = new SimpleAttributeSet();
         StyleConstants.setForeground(style, Color.BLACK);
@@ -27,20 +27,27 @@ public class Styles {
         return style;
     }
     
-    public static SimpleAttributeSet setMessageStyleSending(JTextPane jTextPane) {
+    public static SimpleAttributeSet setStyleMessageSend(JTextPane jTextPane, String msgOut) throws BadLocationException {
+        StyledDocument doc = jTextPane.getStyledDocument();
         SimpleAttributeSet style = new SimpleAttributeSet();
         StyleConstants.setBackground(style, Color.LIGHT_GRAY);
         StyleConstants.setBold(style, true);
+        if(msgOut.contains("successful")){
+            doc.insertString(doc.getLength(), "\n" + msgOut, style);
+        }   
+        else{
+            doc.insertString(doc.getLength(), "\nYou say : " + msgOut, style);
+        }
         return style;
     }
     
-    public static SimpleAttributeSet setMessageStyleRecieved(JTextPane jTextPane, String msgIn) throws BadLocationException{
+    public static SimpleAttributeSet setStyleMessageRecieved(JTextPane jTextPane, String msgIn) throws BadLocationException{
         StyledDocument doc = jTextPane.getStyledDocument();
         SimpleAttributeSet style = new SimpleAttributeSet();
         StyleConstants.setBackground(style, Color.GREEN);
         StyleConstants.setBold(style, true);
-        doc.insertString(doc.getLength(), "\nClient Says : " + 
-                msgIn, style);
+        doc.insertString(doc.getLength(), "\n" + msgIn, style);
         return style;
     }
+    
 }
