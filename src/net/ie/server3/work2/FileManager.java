@@ -19,6 +19,9 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JProgressBar;
+import javax.swing.JTextPane;
+import net.ie.server3.work3.Styles;
 
 /**
  *
@@ -27,13 +30,14 @@ import java.util.logging.Logger;
 public class FileManager {
 
     public static void sendFile(File file, OutputStream outputStream) {
+        
         try {
-            byte[] bytesBuffer = new byte[1024];
-            BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(outputStream, 1024);
+            byte[] bytesBuffer = new byte[10240];
+            BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(outputStream, 10240);
             FileInputStream fileInputStream = new FileInputStream(file);
             int len = 0;
             int countBytes = 0;
-            while ((len = fileInputStream.read(bytesBuffer, 0, 1024)) != -1) {
+            while ((len = fileInputStream.read(bytesBuffer, 0, 10240)) != -1) {
                 bufferedOutputStream.write(bytesBuffer, 0, len);
                 bufferedOutputStream.flush();
                 countBytes = countBytes + len;
@@ -46,13 +50,13 @@ public class FileManager {
     }
 
     public static void recieveFile(File file, InputStream inputStream, int fileRecieved) throws FileNotFoundException, IOException {
-        byte[] byteBuff = new byte[1024];
+        byte[] byteBuff = new byte[10240];
         int len = 0;
         int countBytes = 0;
         FileOutputStream fileOutputStream = new FileOutputStream(file);
-        BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream, 1024);
+        BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream, 10240);
         while (true) {
-            len = bufferedInputStream.read(byteBuff, 0, 1024);
+            len = bufferedInputStream.read(byteBuff, 0, 10240);
             System.out.println(len);
             fileOutputStream.write(byteBuff, 0, len);
             fileOutputStream.flush();
@@ -79,5 +83,22 @@ public class FileManager {
         String[] seperate = path.split("\"");
         fileType = seperate[seperate.length - 1].substring(seperate[seperate.length - 1].indexOf(".") + 1);
         return fileType;
+    }
+
+    public static void copyFileAndDelete(File fileCopy, File fileDestination) {
+        try {
+            InputStream in = new FileInputStream(fileCopy);
+            OutputStream out = new FileOutputStream(fileDestination);
+            byte[] buffer = new byte[4048];
+            int len = 0;
+            while ((len = in.read(buffer)) > 0){
+    	    	out.write(buffer, 0, len);
+    	    }
+            in.close();
+            out.close();
+            fileCopy.delete();
+        } catch(Exception e){
+            e.printStackTrace();
+        } 
     }
 }
