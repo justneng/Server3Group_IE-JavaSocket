@@ -13,12 +13,12 @@ import java.net.*;
  * @author wanchana
  */
 public class Server3 implements Runnable {
-    
+
     public static ServerSocket serversocket;
     public static Socket socket;
     public static Thread thread1;
     public static Thread thread2;
-    
+
     public Server3() {
         try {
             thread1 = new Thread(this);
@@ -34,7 +34,7 @@ public class Server3 implements Runnable {
         } catch (Exception e) {
         }
     }
-    
+
     public void run() {
         try {
             if (Thread.currentThread() == thread1) {
@@ -46,7 +46,7 @@ public class Server3 implements Runnable {
                 String messageOut = "";
 
                 OutputStream outputStream = null;
-                
+
                 do {
                     outputStream = socket.getOutputStream();
                     dataInputStream = new DataInputStream(socket.getInputStream());
@@ -54,60 +54,65 @@ public class Server3 implements Runnable {
                     bufferedReader = new BufferedReader(new InputStreamReader(System.in));
                     printWriter = new PrintWriter(socket.getOutputStream(), true);
                     messageIn = bufferedReader.readLine();
-        
+
                     if (messageIn.equalsIgnoreCase("sw")) {
                         System.out.print("Upload file to client (path) : ");
                         bufferedReader = new BufferedReader(new InputStreamReader(System.in));
                         String fileUpload = bufferedReader.readLine();
                         File file = new File(fileUpload);
                         if (file.exists()) {
-                            printWriter.println("fine#"+ file.length() + "#" + file.getName());
+                            printWriter.println("fine#" + file.length() + "#" + file.getName());
                             FileManager.sendFile(file, outputStream);
                         } 
                         else {
                             System.out.println("File does not exist!");
                         }
+                    } 
+                    else {
+                        printWriter.println("Server says : " + messageIn);
                     }
                 } while (!messageIn.equals("bye"));
             } 
-//            else {
-//                DataInputStream dataInputStream = null;
-//                DataOutputStream dataOutputStream = null;
-//                BufferedReader bufferedReader = null;
-//                PrintWriter printWriter = null;
-//                String messageIn = "";
-//                String messageOut = "";
-//                do {
-//                    dataInputStream = new DataInputStream(socket.getInputStream());
-//                    dataOutputStream = new DataOutputStream(socket.getOutputStream());
-//                    bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-//                    String msg = bufferedReader.readLine();
-//                    String checkMsg = msg.substring(0, 2);
-//                    String fileNameRecieved = "";
-//
-//                    if (checkMsg.equals("m$")) {
-//                        System.out.println("");
-//                        messageOut = msg.substring(2, msg.length());
-//                        System.out.println("Client says : : : " + messageOut);
-//                    } else {
-//                        fileNameRecieved = msg.substring(0, msg.indexOf("#"));
-//                        File dir = new File("C:\\Download-from-client");
-//                        if (!dir.exists()) {
-//                            try {
-//                                System.out.println("Creating... directory C:\\Download-from-client");
-//                                dir.mkdir();
-//                                System.out.println("The directory created");
-//                            } catch (SecurityException securityException) {
-//                                System.out.println("SecurityException occure!!!");
-//                                securityException.printStackTrace();
-//                            }
-//                        }
-//                        File file = new File("C:\\Download-from-client\\" + FileManager.findFileName(fileNameRecieved) + "-downloaded." + FileManager.findFileType(fileNameRecieved));
-////                        FileManager.recieveFile(file, dataInputStream, dataOutputStream);
-//                    }
-//                } while (!messageOut.equals("bye"));
-//            }
-            
+//            Recieve Data from client
+            else {
+                BufferedReader bufferedReader = null;
+                InputStream inputStream = null;
+                String messageIn = "";
+                try {
+                    do {
+                        bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                        messageIn = bufferedReader.readLine();
+                        inputStream = socket.getInputStream();
+                        
+                        if (!messageIn.contains("fine#")) {
+                            System.out.println(messageIn);
+                        } 
+                        else {
+                            String[] splitMsg = messageIn.split("#");
+                            System.out.println(splitMsg[0] + " " + splitMsg[1] + " " + splitMsg[2]);
+                            
+                            File dir = new File("C:\\Download-from-client");
+                            if (!dir.exists()) {
+                                try {
+                                    System.out.println("Creating... directory C:\\Download-from-client");
+                                    dir.mkdir();
+                                    System.out.println("The directory created");
+                                } catch (SecurityException securityException) {
+                                    System.out.println("SecurityException occure!!!");
+                                    securityException.printStackTrace();
+                                }
+                            }
+
+                            File file = new File("c:\\Download-from-client\\recieved-" + splitMsg[2]);
+                            FileManager.recieveFile(file, inputStream, Integer.parseInt(splitMsg[1]));
+                            System.out.println("Download file successful");
+                        }
+                    } while (!messageIn.equals("bye"));
+
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

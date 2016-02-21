@@ -38,7 +38,38 @@ public class Client implements Runnable {
 
         try {
             if (Thread.currentThread() == thread2) {
-                System.out.println("skip");
+                DataInputStream dataInputStream = null;
+                DataOutputStream dataOutputStream = null;
+                BufferedReader bufferedReader = null;
+                PrintWriter printWriter = null;
+                String messageIn = "";
+                String messageOut = "";
+
+                OutputStream outputStream = null;
+
+                do {
+                    outputStream = socket.getOutputStream();
+                    dataInputStream = new DataInputStream(socket.getInputStream());
+                    dataOutputStream = new DataOutputStream(socket.getOutputStream());
+                    bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+                    printWriter = new PrintWriter(socket.getOutputStream(), true);
+                    messageIn = bufferedReader.readLine();
+
+                    if (messageIn.equalsIgnoreCase("sw")) {
+                        System.out.print("Upload file to client (path) : ");
+                        bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+                        String fileUpload = bufferedReader.readLine();
+                        File file = new File(fileUpload);
+                        if (file.exists()) {
+                            printWriter.println("fine#" + file.length() + "#" + file.getName());
+                            FileManager.sendFile(file, outputStream);
+                        } else {
+                            System.out.println("File does not exist!");
+                        }
+                    } else {
+                        printWriter.println("Server says : " + messageIn);
+                    }
+                } while (!messageIn.equals("bye"));
             } else {
                 InputStream inputStream = null;
                 DataInputStream dataInputStream = null;
@@ -51,29 +82,31 @@ public class Client implements Runnable {
                     printWriter = new PrintWriter(socket.getOutputStream(), true);
 
                     bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    String msg = bufferedReader.readLine();
-                    String[] splitMsg = msg.split("#");
-                    System.out.println(splitMsg[0] + " " + splitMsg[1] + " " + splitMsg[2]);
-//                    String check = bufferedReader.readLine().substring(0, 4);
-                    if (splitMsg[0].equals("fine")) {
-                        File dir = new File("C:\\Download-from-server");
-                        if (!dir.exists()) {
-                            try {
-                                System.out.println("Creating... directory C:\\Download-from-server");
-                                dir.mkdir();
-                                System.out.println("The directory created");
-                            } catch (SecurityException securityException) {
-                                System.out.println("SecurityException occure!!!");
-                                securityException.printStackTrace();
+                    String messageIn = bufferedReader.readLine();
+
+                    if (messageIn.contains("fine#")) {
+                        String[] splitMsg = messageIn.split("#");
+                        System.out.println(splitMsg[0] + " " + splitMsg[1] + " " + splitMsg[2]);
+                        if (splitMsg[0].equals("fine")) {
+                            File dir = new File("C:\\Download-from-server");
+                            if (!dir.exists()) {
+                                try {
+                                    System.out.println("Creating... directory C:\\Download-from-server");
+                                    dir.mkdir();
+                                    System.out.println("The directory created");
+                                } catch (SecurityException securityException) {
+                                    System.out.println("SecurityException occure!!!");
+                                    securityException.printStackTrace();
+                                }
                             }
+
+                            File file = new File("c:\\Download-from-server\\recieved-" + splitMsg[2]);
+                            FileManager.recieveFile(file, inputStream, Integer.parseInt(splitMsg[1]));
+                            System.out.println("Download file successful");
                         }
-                        
-                        File file = new File("c:\\Download-from-server\\recieved-"+splitMsg[2]);
-                        FileManager.recieveFile(file, inputStream, Integer.parseInt(splitMsg[1]));
-                        System.out.println("Download file successful");
-                        
-                    } else {
-                        continue;
+                    }
+                    else{
+                        System.out.println(messageIn);
                     }
                 }
             }
