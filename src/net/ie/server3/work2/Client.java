@@ -38,56 +38,24 @@ public class Client implements Runnable {
 
         try {
             if (Thread.currentThread() == thread2) {
-                DataInputStream dataInputStream = null;
-                DataOutputStream dataOutputStream = null;
-                BufferedReader bufferedReader = null;
-                PrintWriter printWriter = null;
-                String messageIn = "";
-                String messageOut = "";
-                    
-                do {
-                    dataInputStream = new DataInputStream(socket.getInputStream());
-                    dataOutputStream = new DataOutputStream(socket.getOutputStream());
-                    bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-                    printWriter = new PrintWriter(socket.getOutputStream(), true);
-                    messageIn = bufferedReader.readLine();
-
-                    if (messageIn.equalsIgnoreCase("sw")) {
-                        System.out.print("Upload file to server (path) : ");
-                        bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-                        String fileUpload = bufferedReader.readLine();
-                        File file = new File(fileUpload);
-                        if (file.exists()) {
-                            FileManager.sendFile(file, dataInputStream, dataOutputStream);
-                            System.out.println("Please Enter to continue...");
-                        } else {
-                            System.out.println("File does not exist!");
-                        }
-                    } else {
-                        printWriter.println("m$" + messageIn);
-                    }
-                } while (!messageIn.equals("bye"));
+                System.out.println("skip");
             } else {
+                InputStream inputStream = null;
                 DataInputStream dataInputStream = null;
-                DataOutputStream dataOutputStream = null;
                 BufferedReader bufferedReader = null;
                 PrintWriter printWriter = null;
-                String messageIn = "";
-                String messageOut = "";
-                do {
+
+                while (true) {
+                    inputStream = socket.getInputStream();
                     dataInputStream = new DataInputStream(socket.getInputStream());
-                    dataOutputStream = new DataOutputStream(socket.getOutputStream());
+                    printWriter = new PrintWriter(socket.getOutputStream(), true);
+
                     bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     String msg = bufferedReader.readLine();
-                    String checkMsg = msg.substring(0, 2);
-                    String fileNameRecieved = "";
-
-                    if (checkMsg.equals("m$")) {
-                        System.out.println("");
-                        messageOut = msg.substring(2, msg.length());
-                        System.out.println("Server says : : : " + messageOut);
-                    } else {
-                        fileNameRecieved = msg.substring(0, msg.indexOf("#"));
+                    String[] splitMsg = msg.split("#");
+                    System.out.println(splitMsg[0] + " " + splitMsg[1] + " " + splitMsg[2]);
+//                    String check = bufferedReader.readLine().substring(0, 4);
+                    if (splitMsg[0].equals("fine")) {
                         File dir = new File("C:\\Download-from-server");
                         if (!dir.exists()) {
                             try {
@@ -99,12 +67,15 @@ public class Client implements Runnable {
                                 securityException.printStackTrace();
                             }
                         }
-
-                        File file = new File("C:\\Download-from-server\\" + FileManager.findFileName(fileNameRecieved) + "-downloaded." + FileManager.findFileType(fileNameRecieved));
-                        FileManager.recieveFile(file, dataInputStream, dataOutputStream);
+                        
+                        File file = new File("c:\\Download-from-server\\recieved-"+splitMsg[2]);
+                        FileManager.recieveFile(file, inputStream, Integer.parseInt(splitMsg[1]));
+                        System.out.println("Download file successful");
+                        
+                    } else {
+                        continue;
                     }
-
-                } while (!messageOut.equals("bye"));
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

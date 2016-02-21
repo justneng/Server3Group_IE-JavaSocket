@@ -5,6 +5,8 @@
  */
 package net.ie.server3.work2;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -12,6 +14,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,36 +25,46 @@ import java.util.logging.Logger;
  * @author wanchana
  */
 public class FileManager {
-            
-    public static void sendFile(File file, DataInputStream dataInputStream, DataOutputStream dataOutputStream) throws FileNotFoundException, IOException {
-        byte[] bytesBuffer = new byte[1024];
-        dataInputStream = new DataInputStream(new FileInputStream(file));
-        dataOutputStream.writeBytes(file.getAbsolutePath() + "#\n");
-        int len = 0;
-        while ((len = dataInputStream.read(bytesBuffer)) != -1) {
-            dataOutputStream.write(bytesBuffer, 0, len);
-            dataOutputStream.flush();
-        }
-        
-        System.out.println("upload file " + file.getName() + " Successfull");
-    }
-    
-    public static void recieveFile(File file, DataInputStream dataInputStream, DataOutputStream dataOutputStream) {
+
+    public static void sendFile(File file, OutputStream outputStream) {
         try {
-            byte[] byteBuff = new byte[1024];
+            byte[] bytesBuffer = new byte[1024];
+            BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(outputStream, 1024);
+            FileInputStream fileInputStream = new FileInputStream(file);
             int len = 0;
-            FileOutputStream fileOutputStream = new FileOutputStream(file);
-            while ((len = dataInputStream.read(byteBuff)) != 4) {
-                fileOutputStream.write(byteBuff, 0, len);
-                fileOutputStream.flush();
+            int countBytes = 0;
+            while ((len = fileInputStream.read(bytesBuffer, 0, 1024)) != -1) {
+                bufferedOutputStream.write(bytesBuffer, 0, len);
+                bufferedOutputStream.flush();
+                countBytes = countBytes + len;
+                System.out.println(len + " " + countBytes);
             }
-            fileOutputStream.close();
-            System.out.println(file.getAbsolutePath() + " was downloaded");
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("upload file " + file.getName() + " Successfull " + countBytes);
+        } catch (Exception ee) {
+            ee.printStackTrace();
         }
+    }
+
+    public static void recieveFile(File file, InputStream inputStream, int fileRecieved) throws FileNotFoundException, IOException {
+        byte[] byteBuff = new byte[1024];
+        int len = 0;
+        int countBytes = 0;
+        FileOutputStream fileOutputStream = new FileOutputStream(file);
+        BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream, 1024);
+        while (true) {
+            len = bufferedInputStream.read(byteBuff, 0, 1024);
+            System.out.println(len);
+            fileOutputStream.write(byteBuff, 0, len);
+            fileOutputStream.flush();
+            countBytes = countBytes + len;
+            System.out.println(countBytes);
+            if (fileRecieved == countBytes) {
+                fileOutputStream.close();
+                break;
+            }
+
+        }
+        System.out.println(file.getAbsolutePath() + " was downloaded " + countBytes);
     }
 
     public static String findFileName(String path) {
