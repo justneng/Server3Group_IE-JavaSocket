@@ -25,7 +25,7 @@ public class Client implements Runnable {
             thread1 = new Thread(this);
             thread2 = new Thread(this);
 //            socket = new Socket("192.168.10.233", 55555);
-            socket = new Socket("localhost", 12121);
+            socket = new Socket("localhost", 55555);
             thread1.start();
             thread2.start();
 

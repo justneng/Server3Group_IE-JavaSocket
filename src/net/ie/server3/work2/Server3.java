@@ -23,7 +23,7 @@ public class Server3 implements Runnable {
         try {
             thread1 = new Thread(this);
             thread2 = new Thread(this);
-            serversocket = new ServerSocket(12121);
+            serversocket = new ServerSocket(55555);
             System.out.println("Server is waiting. . . . ");
             socket = serversocket.accept();
             System.out.println("Client connected with Ip " + socket.getInetAddress().getHostAddress());

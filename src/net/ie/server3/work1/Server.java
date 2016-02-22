@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package net.ie.sever3.work1;
+package net.ie.server3.work1;
 
 /**
  *

@@ -180,6 +180,7 @@ public class Server3ChatGUI extends javax.swing.JFrame {
                 ex.printStackTrace();
             }
         }
+        jTextField1.setText("");
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -197,19 +198,32 @@ public class Server3ChatGUI extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException, BadLocationException {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new Server3ChatGUI().setVisible(true);
-            }
-        });
-
         try {
             UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 
         } catch (Exception e) {
             System.err.println("Look and feel not set.");
         }
+        
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new Server3ChatGUI().setVisible(true);
+            }
+        });
+        try {
+            UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+
+        } catch (Exception e) {
+            System.err.println("Look and feel not set.");
+        }
+        
+//        try {
+//            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//
+//        } catch (Exception e) {
+//            System.err.println("Look and feel not set");
+//        }
 
         try {
             ServerSocket serverSocket = new ServerSocket(55555);

@@ -36,7 +36,7 @@ public class Styles {
             doc.insertString(doc.getLength(), "\n" + msgOut, style);
         }   
         else{
-            doc.insertString(doc.getLength(), "\nYou say : " + msgOut, style);
+            doc.insertString(doc.getLength(), "\nsay : " + msgOut, style);
         }
         return style;
     }
