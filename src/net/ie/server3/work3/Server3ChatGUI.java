@@ -170,7 +170,7 @@ public class Server3ChatGUI extends javax.swing.JFrame {
                 e.printStackTrace();
             } catch (BadLocationException ex) {
                 Logger.getLogger(Server3ChatGUI.class.getName()).log(Level.SEVERE, null, ex);
-            } 
+            }
         } else {
             try {
                 printWriter = new PrintWriter(socket.getOutputStream(), true);
@@ -205,9 +205,10 @@ public class Server3ChatGUI extends javax.swing.JFrame {
         });
 
         try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+
         } catch (Exception e) {
-            System.err.println("Look and feel not set");
+            System.err.println("Look and feel not set.");
         }
 
         try {
@@ -232,8 +233,7 @@ public class Server3ChatGUI extends javax.swing.JFrame {
 
                     if (!messageIn.contains("fine#")) {
                         Styles.setStyleMessageRecieved(jTextPane1, messageIn);
-                    }
-                    else{
+                    } else {
                         String[] splitMsg = messageIn.split("#");
                         System.out.println(splitMsg[0] + " " + splitMsg[1] + " " + splitMsg[2]);
                         if (splitMsg[0].equals("fine")) {
@@ -262,18 +262,16 @@ public class Server3ChatGUI extends javax.swing.JFrame {
                                 int n = jFileChooser.showSaveDialog(jTextPane1);
                                 if (n == JFileChooser.APPROVE_OPTION) {
                                     if ((jFileChooser.getSelectedFile().toString()).equals(file.getAbsoluteFile().toString())) {
-                                    Styles.setStyleMessageRecieved(jTextPane1, "Download Completed.");
-                                    continue;
-                                } 
-                                else {
-                                    File fileDestination = new File(jFileChooser.getSelectedFile().toString());
-                                    FileManager.copyFileAndDelete(file, fileDestination);
-                                    System.out.println("Save new file successful!");
-                                    Styles.setStyleMessageRecieved(jTextPane1, "Download Completed.");
+                                        Styles.setStyleMessageRecieved(jTextPane1, "Download Completed.");
+                                        continue;
+                                    } else {
+                                        File fileDestination = new File(jFileChooser.getSelectedFile().toString());
+                                        FileManager.copyFileAndDelete(file, fileDestination);
+                                        System.out.println("Save new file successful!");
+                                        Styles.setStyleMessageRecieved(jTextPane1, "Download Completed.");
+                                    }
                                 }
-                                }
-                            } 
-                            else {
+                            } else {
                                 file.delete();
                                 dialogs.dispose();
                             }
