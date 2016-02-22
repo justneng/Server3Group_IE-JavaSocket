@@ -89,7 +89,7 @@ public class FileManager {
         try {
             InputStream in = new FileInputStream(fileCopy);
             OutputStream out = new FileOutputStream(fileDestination);
-            byte[] buffer = new byte[4048];
+            byte[] buffer = new byte[4096];
             int len = 0;
             while ((len = in.read(buffer)) > 0){
     	    	out.write(buffer, 0, len);

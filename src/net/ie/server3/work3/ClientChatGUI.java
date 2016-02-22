@@ -159,7 +159,7 @@ public class ClientChatGUI extends javax.swing.JFrame {
         } else {
             try {
                 printWriter = new PrintWriter(socket.getOutputStream(), true);
-                printWriter.println("Server says : " + messageOut);
+                printWriter.println("Client says : " + messageOut);
                 Styles.setStyleMessageSend(jTextPane1, messageOut);
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -188,10 +188,10 @@ public class ClientChatGUI extends javax.swing.JFrame {
         });
 
         try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 
         } catch (Exception e) {
-            System.err.println("Look and feel not set");
+            System.err.println("Look and feel not set.");
         }
 
         try {
