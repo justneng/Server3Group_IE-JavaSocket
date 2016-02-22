@@ -159,12 +159,13 @@ public class ClientChatGUI extends javax.swing.JFrame {
         } else {
             try {
                 printWriter = new PrintWriter(socket.getOutputStream(), true);
-                printWriter.println("Server says : " + messageOut);
+                printWriter.println("Client says : " + messageOut);
                 Styles.setStyleMessageSend(jTextPane1, messageOut);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
         }
+        jTextField1.setText("");
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -181,19 +182,25 @@ public class ClientChatGUI extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException, BadLocationException {
+        try {
+            UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+
+        } catch (Exception e) {
+            System.err.println("Look and feel not set.");
+        }
+
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new ClientChatGUI().setVisible(true);
             }
         });
 
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-
-        } catch (Exception e) {
-            System.err.println("Look and feel not set");
-        }
-
+//        try {
+//            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//
+//        } catch (Exception e) {
+//            System.err.println("Look and feel not set");
+//        }
         try {
             socket = new Socket("localhost", 55555);
 
@@ -243,8 +250,7 @@ public class ClientChatGUI extends javax.swing.JFrame {
                                 if ((jFileChooser.getSelectedFile().toString()).equals(file.getAbsoluteFile().toString())) {
                                     Styles.setStyleMessageRecieved(jTextPane1, "Download Completed.");
                                     continue;
-                                } 
-                                else {
+                                } else {
                                     File fileDestination = new File(jFileChooser.getSelectedFile().toString());
                                     FileManager.copyFileAndDelete(file, fileDestination);
                                     System.out.println("Save new file successful!");

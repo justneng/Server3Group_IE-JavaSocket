@@ -170,7 +170,7 @@ public class Server3ChatGUI extends javax.swing.JFrame {
                 e.printStackTrace();
             } catch (BadLocationException ex) {
                 Logger.getLogger(Server3ChatGUI.class.getName()).log(Level.SEVERE, null, ex);
-            } 
+            }
         } else {
             try {
                 printWriter = new PrintWriter(socket.getOutputStream(), true);
@@ -180,6 +180,7 @@ public class Server3ChatGUI extends javax.swing.JFrame {
                 ex.printStackTrace();
             }
         }
+        jTextField1.setText("");
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -197,18 +198,26 @@ public class Server3ChatGUI extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException, BadLocationException {
+        try {
+            UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+
+        } catch (Exception e) {
+            System.err.println("Look and feel not set.");
+        }
+        
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
                 new Server3ChatGUI().setVisible(true);
             }
         });
-
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            System.err.println("Look and feel not set");
-        }
+        
+//        try {
+//            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//
+//        } catch (Exception e) {
+//            System.err.println("Look and feel not set");
+//        }
 
         try {
             ServerSocket serverSocket = new ServerSocket(55555);
@@ -232,8 +241,7 @@ public class Server3ChatGUI extends javax.swing.JFrame {
 
                     if (!messageIn.contains("fine#")) {
                         Styles.setStyleMessageRecieved(jTextPane1, messageIn);
-                    }
-                    else{
+                    } else {
                         String[] splitMsg = messageIn.split("#");
                         System.out.println(splitMsg[0] + " " + splitMsg[1] + " " + splitMsg[2]);
                         if (splitMsg[0].equals("fine")) {
@@ -262,18 +270,16 @@ public class Server3ChatGUI extends javax.swing.JFrame {
                                 int n = jFileChooser.showSaveDialog(jTextPane1);
                                 if (n == JFileChooser.APPROVE_OPTION) {
                                     if ((jFileChooser.getSelectedFile().toString()).equals(file.getAbsoluteFile().toString())) {
-                                    Styles.setStyleMessageRecieved(jTextPane1, "Download Completed.");
-                                    continue;
-                                } 
-                                else {
-                                    File fileDestination = new File(jFileChooser.getSelectedFile().toString());
-                                    FileManager.copyFileAndDelete(file, fileDestination);
-                                    System.out.println("Save new file successful!");
-                                    Styles.setStyleMessageRecieved(jTextPane1, "Download Completed.");
+                                        Styles.setStyleMessageRecieved(jTextPane1, "Download Completed.");
+                                        continue;
+                                    } else {
+                                        File fileDestination = new File(jFileChooser.getSelectedFile().toString());
+                                        FileManager.copyFileAndDelete(file, fileDestination);
+                                        System.out.println("Save new file successful!");
+                                        Styles.setStyleMessageRecieved(jTextPane1, "Download Completed.");
+                                    }
                                 }
-                                }
-                            } 
-                            else {
+                            } else {
                                 file.delete();
                                 dialogs.dispose();
                             }
